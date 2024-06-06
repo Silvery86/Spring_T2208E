@@ -8,7 +8,6 @@ import org.aptech.t2208e.repository.StudentRepository;
 import org.aptech.t2208e.repository.StudentRepositoryReflect;
 import org.aptech.t2208e.repository.impl.StudentRepositoryImpl;
 import org.aptech.t2208e.service.StudentService;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +40,7 @@ public class StudentServiceImpl  implements StudentService {
                 .collect(Collectors.toList());
     }
 
+
     public static void main(String[] args) {
         List<String> strs = Arrays.asList("sfdsfd","sfsfsd","sgsdgdsg");
 //        for(String s : strs){
@@ -48,8 +48,6 @@ public class StudentServiceImpl  implements StudentService {
 //        }
         // -> lambda
         strs.forEach(System.err::println);
-
-
         List<Student> students = new ArrayList<>();
         // get all name of student -> to list <String>
 
@@ -58,13 +56,7 @@ public class StudentServiceImpl  implements StudentService {
             strName.add(s.getFirstName());
         }
         List<String> strName1 = students.stream().map(Student::getFirstName).collect(Collectors.toList());
-
-
-
-
-
     }
-
 
     @Override
     public StudentDto getById(Long id) {
@@ -79,6 +71,14 @@ public class StudentServiceImpl  implements StudentService {
                 .map(studentMapper::entityToDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Optional<StudentDto> createStudent(StudentDto studentDto) {
+        Optional<Student> optionalStudent = studentRepository1.createStudent(studentDto);
+        return optionalStudent.map(studentMapper::entityToDto);
+    }
+
+
 
 
 }

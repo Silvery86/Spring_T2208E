@@ -3,12 +3,10 @@ package org.aptech.t2208e.controller;
 import org.aptech.t2208e.dto.StudentDto;
 import org.aptech.t2208e.service.StudentService;
 import org.aptech.t2208e.service.impl.StudentServiceImpl;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -29,4 +27,12 @@ public class StudentController {
     public List<StudentDto> searchByFirstName(@PathVariable String studentFirstName){
         return studentService.searchByFirstName(studentFirstName);
     }
+
+    @PutMapping(value = "student/create")
+    public Optional<StudentDto> createStudent(@RequestBody StudentDto studentDto){
+        System.out.println("Received studentDto: " + studentDto);
+        return studentService.createStudent(studentDto);
+    }
+
+
 }

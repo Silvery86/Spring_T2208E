@@ -1,5 +1,7 @@
 package org.aptech.t2208e.jpaRepository.main.impl;
 
+import org.aptech.t2208e.dto.StudentDto;
+import org.aptech.t2208e.entity.Student;
 import org.aptech.t2208e.jpaRepository.annotation.Entity;
 import org.aptech.t2208e.jpaRepository.consts.SqlQueryConstants;
 import org.aptech.t2208e.jpaRepository.main.JpaExecutor;
@@ -10,8 +12,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,4 +87,41 @@ public abstract class JpaExecutorImpl<T> implements JpaExecutor<T> {
             throw new RuntimeException(e);
         }
     }
+
+    public Optional<T> createStudent(StudentDto studentDto) {
+        String sql = SqlQueryConstants.SQL_INSERT_DATA.replace("%table_name%", this.tableName);
+
+        try (Connection con = ConnectionPool.getInstance().getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            pstmt.setString(1, studentDto.getFirstName());
+            pstmt.setString(2, studentDto.getLastName());
+            pstmt.setString(3, studentDto.getAddress());
+            pstmt.setInt(4, studentDto.getAge());
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        long generatedId = generatedKeys.getLong(1);
+                        studentDto.setId(generatedId);
+                    }
+                }
+                // Create and return a Student entity with the generated ID
+                Student studentEntity = new Student();
+                studentEntity.setId(studentDto.getId());
+                studentEntity.setFirstName(studentDto.getFirstName());
+                studentEntity.setLastName(studentDto.getLastName());
+                studentEntity.setAddress(studentDto.getAddress());
+                studentEntity.setAge(studentDto.getAge());
+                return (Optional<T>) Optional.of(studentEntity);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creating student: " + e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+
 }
