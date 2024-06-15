@@ -1,5 +1,6 @@
 package org.aptech.t2208e.jpaRepository.main.impl;
 
+import org.aptech.t2208e.dto.EmployeeDto;
 import org.aptech.t2208e.dto.StudentDto;
 import org.aptech.t2208e.entity.Student;
 import org.aptech.t2208e.jpaRepository.annotation.Entity;
