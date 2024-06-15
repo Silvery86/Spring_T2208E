@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 
+
 import java.util.Date;
 
 @Getter
@@ -18,4 +19,6 @@ public class EmployeeDto {
     private double insuranceBase;
     private int departmentId;
     private String position;
+    private String email;
+    private boolean isOff;
 }
