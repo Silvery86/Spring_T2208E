@@ -6,4 +6,7 @@ import java.util.Optional;
 
 public interface DepartmentService {
     Optional<DepartmentDto> createDepartment(DepartmentDto departmentDto);
+    void setChiefAndDeputyId(String position, Long employeeId, int id);
+
+    void updateEmployeeNumber(String option, int id);
 }

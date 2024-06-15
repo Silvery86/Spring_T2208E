@@ -13,9 +13,20 @@ import java.util.Optional;
 public class DepartmentServiceImpl implements DepartmentService {
     DepartmentRepository departmentRepository = new DepartmentRepositoryImpl();
     DepartmentMapper departmentMapper = new DepartmentMapperImpl();
+
     @Override
     public Optional<DepartmentDto> createDepartment(DepartmentDto departmentDto) {
         Optional<Department> optionalDepartment = departmentRepository.createDepartment(departmentDto);
         return optionalDepartment.map(departmentMapper::entityToDto);
+    }
+
+    @Override
+    public void setChiefAndDeputyId(String position, Long employeeId, int id) {
+        departmentRepository.setChiefAndDeputyId(position, employeeId, id);
+    }
+
+    @Override
+    public void updateEmployeeNumber(String option, int id) {
+        departmentRepository.updateEmployeeNumber(option, id);
     }
 }
