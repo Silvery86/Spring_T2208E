@@ -50,6 +50,6 @@ public class Employee {
     private String email;
 
     @Column(columnName = "is_off")
-    private boolean isOff;
+    private Boolean isOff;
 
 }

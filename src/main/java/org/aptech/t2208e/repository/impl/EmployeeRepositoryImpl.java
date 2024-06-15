@@ -12,15 +12,80 @@ import java.util.List;
 import java.util.Optional;
 
 public class EmployeeRepositoryImpl implements EmployeeRepository {
+    private static final String SQL_QUERY_GET_ALL = "SELECT * FROM Employee WHERE is_off = false LIMIT ? OFFSET ?";
     private  static final String SQL_FIND_BY_ID = "SELECT * FROM Employee WHERE id = ?";
     private static final String SQL_QUERY_CREATE_EMPLOYEE = "INSERT INTO Employee (full_name, address, date_of_birth, base_salary, net_salary, insurance_base, department_id, position, email, is_off) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     private static final String SQL_QUERY_UPDATE_EMPLOYEE = "UPDATE Employee SET full_name = ?, address = ?, date_of_birth = ?, base_salary = ?, net_salary = ?, insurance_base = ?, department_id = ?, position = ?, email = ?, is_off = ? WHERE id = ?";
+    private static final String SQL_FIND_ALL_EMPLOYEES = "SELECT * FROM Employee WHERE is_off = ?";
     private static final String SQL_ERROR_DUPLICATE_KEY = "23000";
 
 
     @Override
     public List<Employee> getAll() {
-        return List.of();
+        List<Employee> employees = new ArrayList<>();
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        try (Connection con = connectionPool.getConnection();
+             PreparedStatement pt = con.prepareStatement(SQL_FIND_ALL_EMPLOYEES)) {
+
+            pt.setBoolean(1, false); // Set parameter for is_off = false
+            ResultSet rs = pt.executeQuery();
+            while (rs.next()) {
+                Employee employee = new Employee();
+                employee.setId(rs.getLong("id"));
+                employee.setFullName(rs.getString("full_name"));
+                employee.setAddress(rs.getString("address"));
+                employee.setDateOfBirth(rs.getDate("date_of_birth"));
+                employee.setBaseSalary(rs.getDouble("base_salary"));
+                employee.setNetSalary(rs.getDouble("net_salary"));
+                employee.setInsuranceBase(rs.getDouble("insurance_base"));
+                employee.setDepartmentId(rs.getInt("department_id"));
+                employee.setPosition(rs.getString("position"));
+                employee.setEmail(rs.getString("email"));
+                employee.setIsOff(rs.getBoolean("is_off"));
+                employees.add(employee);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error get all employees", e);
+        }
+        return employees;
+    }
+
+    @Override
+    public List<Employee> getAll(int start, int size) {
+        List<Employee> employees = new ArrayList<>();
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection con = connectionPool.getConnection();
+        try (PreparedStatement pt = con.prepareStatement(SQL_QUERY_GET_ALL)) {
+            pt.setInt(1, size);
+            pt.setInt(2, start);
+            ResultSet rs = pt.executeQuery();
+            while (rs.next()) {
+                Employee employee = new Employee();
+                employee.setId(rs.getLong("id"));
+                employee.setFullName(rs.getString("full_name"));
+                employee.setAddress(rs.getString("address"));
+                employee.setDateOfBirth(rs.getDate("date_of_birth"));
+                employee.setBaseSalary(rs.getDouble("base_salary"));
+                employee.setNetSalary(rs.getDouble("net_salary"));
+                employee.setInsuranceBase(rs.getDouble("insurance_base"));
+                employee.setDepartmentId(rs.getInt("department_id"));
+                employee.setPosition(rs.getString("position"));
+                employee.setEmail(rs.getString("email"));
+                employee.setIsOff(rs.getBoolean("is_off"));
+                employees.add(employee);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Log or handle as needed
+                }
+            }
+        }
+        return employees;
     }
 
     @Override
@@ -37,7 +102,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
             pt.setInt(7, employeeDto.getDepartmentId());
             pt.setString(8, employeeDto.getPosition());
             pt.setString(9, employeeDto.getEmail());
-            pt.setBoolean(10, employeeDto.isOff());
+            pt.setBoolean(10, employeeDto.getIsOff());
             int rowsAffected = pt.executeUpdate();
             if (rowsAffected > 0) {
                 try (ResultSet rs = pt.getGeneratedKeys()) {
@@ -54,12 +119,13 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
                         employee.setDepartmentId(employeeDto.getDepartmentId());
                         employee.setPosition(employeeDto.getPosition());
                         employee.setEmail(employeeDto.getEmail());
-                        employee.setOff(employeeDto.isOff());
+                        employee.setIsOff(employeeDto.getIsOff());
 
                         return Optional.of(employee);
                     }
                 }
             }
+            con.close();
         } catch (SQLException e) {
             if (SQL_ERROR_DUPLICATE_KEY.equals(e.getSQLState())) {
                 String errorMessage = "Employee with email '" + employeeDto.getEmail() + "' already exists.";
@@ -86,7 +152,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
             pt.setInt(7, employeeDto.getDepartmentId());
             pt.setString(8, employeeDto.getPosition());
             pt.setString(9, employeeDto.getEmail());
-            pt.setBoolean(10, employeeDto.isOff());
+            pt.setBoolean(10, employeeDto.getIsOff());
             pt.setLong(11, id);
             int rowsAffected = pt.executeUpdate();
             if (rowsAffected > 0) {
@@ -101,7 +167,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
                 employee.setDepartmentId(employeeDto.getDepartmentId());
                 employee.setPosition(employeeDto.getPosition());
                 employee.setEmail(employeeDto.getEmail());
-                employee.setOff(employeeDto.isOff());
+                employee.setIsOff(employeeDto.getIsOff());
 
                 return Optional.of(employee);
             }
@@ -111,6 +177,14 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
                 throw new RuntimeException(errorMessage);
             } else {
                 throw new RuntimeException(e);
+            }
+        }finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Log or handle as needed
+                }
             }
         }
         System.err.println("Employee is not exist with Id:" + id);
@@ -138,11 +212,19 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
                 employee.setDepartmentId(rs.getInt("department_id"));
                 employee.setPosition(rs.getString("position"));
                 employee.setEmail(rs.getString("email"));
-                employee.setOff(rs.getBoolean("is_off"));
+                employee.setIsOff(rs.getBoolean("is_off"));
                 employees.add(employee);
             }
         }catch (SQLException e){
             throw new RuntimeException(e);
+        }finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Log or handle as needed
+                }
+            }
         }
         return Optional.of(employees);
     }

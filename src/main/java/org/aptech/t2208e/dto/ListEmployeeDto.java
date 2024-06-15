@@ -3,13 +3,10 @@ package org.aptech.t2208e.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-
-
 import java.util.Date;
-
 @Getter
 @Setter
-public class EmployeeDto {
+public class ListEmployeeDto {
     private Long id;
     private String fullName;
     private String address;
@@ -17,8 +14,8 @@ public class EmployeeDto {
     private double baseSalary;
     private double netSalary;
     private double insuranceBase;
-    private int departmentId;
+    private String departmentName;
+    private String chiefName;
     private String position;
     private String email;
-    private Boolean isOff;
 }

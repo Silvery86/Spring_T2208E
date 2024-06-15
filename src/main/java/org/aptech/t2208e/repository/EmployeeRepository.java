@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface EmployeeRepository {
     List<Employee> getAll();
+    List<Employee> getAll(int start, int size);
     Optional<Employee> createEmployee(EmployeeDto employeeDto);
     Optional<Employee> updateEmployee(Long id, EmployeeDto employeeDto);
     Optional<List<Employee>> findById(Long id);

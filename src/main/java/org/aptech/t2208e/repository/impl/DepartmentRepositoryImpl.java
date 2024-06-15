@@ -57,6 +57,14 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
             } else {
                 throw new RuntimeException(e);
             }
+        }finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Log or handle as needed
+                }
+            }
         }
         return Optional.empty();
     }
@@ -138,6 +146,14 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error removing chief or deputy ID", e);
+        }finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace(); // Log or handle as needed
+                }
+            }
         }
     }
 
@@ -177,6 +193,7 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
             PreparedStatement pt = con.prepareStatement(SQL_FIND_BY_ID);
             pt.setInt(1,id);
             ResultSet rs = pt.executeQuery();
+
             while (rs.next()){
                 Department department = new Department();
                 department.setId(rs.getInt("id"));
@@ -188,8 +205,13 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
                 department.setDeputyId2(rs.getObject("deputy_2_id") != null ? rs.getLong("deputy_2_id") : null);
                 departments.add(department);
             }
+
         }catch (SQLException e){
             throw new RuntimeException(e);
+        }finally {
+            if (con != null) {
+                connectionPool.releaseConnection(con); // Release the connection back to the pool
+            }
         }
         return Optional.of(departments);
     }
