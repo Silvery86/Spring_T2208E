@@ -81,4 +81,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         return "Not assign";
     }
+
+    @Override
+    public boolean removeEmployee(Long id) {
+        return employeeRepository.removeEmployee(id);
+    }
 }

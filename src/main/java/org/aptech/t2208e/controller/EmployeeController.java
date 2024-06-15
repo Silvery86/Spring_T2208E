@@ -135,4 +135,9 @@ public class EmployeeController {
             return Optional.empty();
         }
     }
+
+    @DeleteMapping("/employee/delete/{id}")
+    public boolean deleteEmployee(@PathVariable Long id) {
+        return employeeService.removeEmployee(id);
+    }
 }

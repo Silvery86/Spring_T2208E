@@ -16,4 +16,5 @@ public interface DepartmentService {
     DepartmentDto findById(int id);
 
     void removeChiefAndDeputyId(String position, Long employeeId, int id);
+
 }

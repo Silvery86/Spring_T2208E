@@ -1,7 +1,6 @@
 package org.aptech.t2208e.repository.impl;
 
 import org.aptech.t2208e.dto.EmployeeDto;
-import org.aptech.t2208e.entity.Department;
 import org.aptech.t2208e.entity.Employee;
 import org.aptech.t2208e.repository.EmployeeRepository;
 import org.aptech.t2208e.utils.ConnectionPool;
@@ -17,6 +16,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
     private static final String SQL_QUERY_CREATE_EMPLOYEE = "INSERT INTO Employee (full_name, address, date_of_birth, base_salary, net_salary, insurance_base, department_id, position, email, is_off) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     private static final String SQL_QUERY_UPDATE_EMPLOYEE = "UPDATE Employee SET full_name = ?, address = ?, date_of_birth = ?, base_salary = ?, net_salary = ?, insurance_base = ?, department_id = ?, position = ?, email = ?, is_off = ? WHERE id = ?";
     private static final String SQL_FIND_ALL_EMPLOYEES = "SELECT * FROM Employee WHERE is_off = ?";
+    private static final String SQL_REMOVE_EMPLOYEE = "DELETE FROM Employee WHERE id = ? AND is_off = true";
     private static final String SQL_ERROR_DUPLICATE_KEY = "23000";
 
 
@@ -76,14 +76,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace(); // Log or handle as needed
-                }
-            }
         }
         return employees;
     }
@@ -178,14 +170,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
             } else {
                 throw new RuntimeException(e);
             }
-        }finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace(); // Log or handle as needed
-                }
-            }
         }
         System.err.println("Employee is not exist with Id:" + id);
         return Optional.empty();
@@ -227,5 +211,25 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
             }
         }
         return Optional.of(employees);
+    }
+
+    @Override
+    public boolean removeEmployee(Long id) {
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection con = connectionPool.getConnection();
+        try{
+            PreparedStatement pt = con.prepareStatement(SQL_REMOVE_EMPLOYEE);
+            pt.setLong(1, id);
+                int rowsAffected = pt.executeUpdate();
+                if(rowsAffected > 0){
+                    System.err.println("Success remove Employee ID" + id);
+                }else{
+                    System.err.println("Cant remove not Off Employee ID" + id);
+                }
+                return rowsAffected > 0;
+
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 }

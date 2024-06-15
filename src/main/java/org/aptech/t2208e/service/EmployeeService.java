@@ -14,4 +14,5 @@ public interface EmployeeService {
     List<EmployeeDto> getAll(int start, int size);
     String getDepartmentName(int departmentId);
     String getChiefName(int departmentId);
+    boolean removeEmployee(Long id);
 }

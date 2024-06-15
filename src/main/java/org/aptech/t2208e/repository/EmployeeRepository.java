@@ -13,4 +13,5 @@ public interface EmployeeRepository {
     Optional<Employee> createEmployee(EmployeeDto employeeDto);
     Optional<Employee> updateEmployee(Long id, EmployeeDto employeeDto);
     Optional<List<Employee>> findById(Long id);
+    boolean removeEmployee(Long id);
 }
