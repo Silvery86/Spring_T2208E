@@ -2,14 +2,14 @@ package org.aptech.t2208e.utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionPool {
     private static ConnectionPool instance;
     private List<Connection> connections;
-    private static final int POOL_SIZE = 10;
-
+    private static final int POOL_SIZE = 20;
 
     // db config
     private static final String DB_URL = "jdbc:mysql://localhost:3307/t2208e_sem4";
@@ -17,34 +17,67 @@ public class ConnectionPool {
     private static final String USERNAME = "root";
     private static final String PASSWORD = "admin@123";
 
-    public static synchronized ConnectionPool getInstance(){
-        if(instance == null){
+    private ConnectionPool() {
+        connections = new ArrayList<>();
+        initializeConnectionPool();
+    }
+
+    public static synchronized ConnectionPool getInstance() {
+        if (instance == null) {
             instance = new ConnectionPool();
         }
         return instance;
     }
-    public  synchronized Connection getConnection(){
-        if(connections.isEmpty()){
-            return null;
+
+    private void initializeConnectionPool() {
+        try {
+            Class.forName(DRIVER_CLASS_NAME);
+            for (int i = 0; i < POOL_SIZE; i++) {
+                Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+                connections.add(connection);
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            System.err.println("Error initializing connection pool: " + ex.getMessage());
+            // Consider throwing an exception or handling the error appropriately
         }
-        return  connections.remove(connections.size() -1);
     }
 
-
-
-    public ConnectionPool() {
-        // init all connection follow poolsize
-        connections = new ArrayList<>();
-        for (int  i = 0 ; i < POOL_SIZE ; i ++){
-            Connection newConnection = null;
+    public synchronized Connection getConnection() {
+        Connection connection = null;
+        if (!connections.isEmpty()) {
+            connection = connections.remove(connections.size() - 1);
             try {
-                // before have connection  ,  driver class
-                Class.forName(DRIVER_CLASS_NAME);
-                newConnection = DriverManager.getConnection(DB_URL,USERNAME,PASSWORD);
-                connections.add(newConnection);
-            }catch (Exception ex){
-                System.err.println("Exception : "+ex.getMessage());
+                if (connection.isClosed() || !connection.isValid(5)) {
+                    connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+                }
+            } catch (SQLException ex) {
+                System.err.println("Error checking or recreating connection: " + ex.getMessage());
+                connection = null;
             }
         }
+        return connection;
+    }
+
+    public synchronized void releaseConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                if (!connection.isClosed()) {
+                    connections.add(connection);
+                }
+            } catch (SQLException ex) {
+                System.err.println("Error releasing connection: " + ex.getMessage());
+            }
+        }
+    }
+
+    public synchronized void shutdown() {
+        for (Connection connection : connections) {
+            try {
+                connection.close();
+            } catch (SQLException ex) {
+                System.err.println("Error closing connection: " + ex.getMessage());
+            }
+        }
+        connections.clear();
     }
 }
