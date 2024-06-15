@@ -1,0 +1,165 @@
+{
+	"info": {
+		"_postman_id": "09d5eda4-9e8d-4444-90d6-53d1d84e59d8",
+		"name": "T2208E",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29164065"
+	},
+	"item": [
+		{
+			"name": "Create Department API",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"depName\" : \"IT\",\r\n    \"roomNo\" : \"B4\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/department/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"department",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Employee API",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fullName\": \"John7\",\r\n    \"address\": \"123 Main St\",\r\n    \"dateOfBirth\": \"1990-01-01\",\r\n    \"baseSalary\": 50000,\r\n    \"netSalary\": 45000,\r\n    \"insuranceBase\": 2000,\r\n    \"departmentId\": 1,\r\n    \"position\": \"Employee\",\r\n    \"email\": \"john7.doe@example.com\",\r\n    \"isOff\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/employee/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"employee",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Department By Id API",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/department/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"department",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Employee API",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fullName\": \"John2\",\r\n    \"address\": \"123 Main St\",\r\n    \"dateOfBirth\": \"1990-01-01\",\r\n    \"baseSalary\": 50000,\r\n    \"netSalary\": 45000,\r\n    \"insuranceBase\": 2000,\r\n    \"departmentId\": 3,\r\n    \"position\": \"Chief\",\r\n    \"email\": \"john2.doe@example.com\",\r\n    \"isOff\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/employee/update/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"employee",
+						"update",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Employee API",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Employee With Pagination API",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Employee API",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/employee/delete/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"employee",
+						"delete",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
